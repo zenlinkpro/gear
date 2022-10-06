@@ -9,31 +9,33 @@ use crate::{
     },
     result::{Error, Result},
 };
+use clap::Parser;
 use std::fmt;
-use structopt::StructOpt;
 use subxt::{
     sp_core::{crypto::Ss58Codec, sr25519::Pair, Pair as PairT},
     sp_runtime::AccountId32,
 };
 
-#[derive(Debug, StructOpt)]
+#[derive(Debug, Parser)]
 pub enum Action {
+    /// Get balance info of the current account
     Balance,
+    /// Get mailbox info of the current account
     Mailbox {
         /// The count of mails for fetching
-        #[structopt(default_value = "10", short, long)]
+        #[clap(default_value = "10", short, long)]
         count: u32,
     },
 }
 
 /// Get account info from ss58address.
-#[derive(Debug, StructOpt)]
+#[derive(Debug, Parser)]
 pub struct Info {
     /// Info of this address, if none, will use the logged in account.
     pub address: Option<String>,
 
     /// Info of balance, mailbox, etc.
-    #[structopt(subcommand)]
+    #[clap(subcommand)]
     pub action: Action,
 }
 
@@ -107,7 +109,7 @@ impl fmt::Debug for Mail {
             )
             .field(
                 "payload",
-                &["0x", &hex::encode(&self.message.payload)].concat(),
+                &["0x", &hex::encode(&self.message.payload.0)].concat(),
             )
             .field("value", &self.message.value)
             .field("reply", &self.message.reply.as_ref().map(DebugReplyDetails))
